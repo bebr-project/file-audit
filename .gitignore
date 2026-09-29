@@ -1,0 +1,13 @@
+data/*.json
+data/*.jsonl
+data/*.tmp
+data/*.lock
+data/*.log
+events*.jsonl
+server.log
+server-error.log
+monitoring.json
+collector-state.json
+collector-status.json
+collector.lock
+server.pid

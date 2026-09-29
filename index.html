@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8f9">
+  <title>Аудит файлов</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Перейти к содержимому</a>
+  <div class="app-shell">
+    <header class="work-header">
+      <div class="work-header-row">
+        <a class="work-brand" href="#overview" data-view="overview">Аудит файлов</a>
+        <div class="work-connection"><span class="server-dot" id="sidebar-status-dot" aria-hidden="true"></span><span id="server-host">Ожидание источника</span></div>
+      </div>
+      <div class="work-header-row work-navigation-row">
+        <nav class="work-nav" aria-label="Разделы">
+          <button class="nav-link is-active" type="button" data-view="overview" aria-current="page">Обзор</button>
+          <button class="nav-link" type="button" data-view="events">Журнал <span class="nav-count" id="nav-event-count">—</span></button>
+          <button class="nav-link" type="button" data-view="sources">Настройка</button>
+        </nav>
+        <span class="work-updated" id="refresh-label">Обновлено только что</span>
+      </div>
+    </header>
+
+    <div class="main-column">
+      <main id="main-content" class="content-area" tabindex="-1">
+        <div id="demo-banner" class="demo-banner" role="status" hidden>
+          <span class="demo-banner-icon" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.25" stroke="currentColor" stroke-width="1.5"/><path d="M10 9v4M10 6.2h.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+          <span><strong>Демонстрационный режим</strong><span>Показаны примеры. Настройте аудит папок, чтобы начать сбор реальных событий.</span></span>
+          <button type="button" class="banner-action" data-open-connect>Настроить папки <span aria-hidden="true">→</span></button>
+          <button type="button" class="icon-button banner-close" aria-label="Скрыть уведомление" data-dismiss-banner><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+        </div>
+
+        <section class="view-panel is-visible" id="overview-view" aria-labelledby="page-title">
+          <div class="page-heading">
+            <div><h1 id="page-title">Обзор аудита</h1><p class="page-subtitle">События записи и удаления файлов в выбранных папках.</p></div>
+            <button class="button button-primary" type="button" data-open-connect><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 3v14M3 10h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>Настроить папки</button>
+          </div>
+
+          <section class="summary-block" aria-label="Сводка за выбранный период">
+            <div class="summary-heading"><h2>Сводка</h2><span id="summary-period">Последние 24 часа</span></div>
+            <dl class="summary-list">
+              <div class="summary-item summary-write"><dt>Запись в файл</dt><dd id="metric-writes">—</dd></div>
+              <div class="summary-item summary-delete"><dt>Удаление файла</dt><dd id="metric-deletes">—</dd></div>
+              <div class="summary-item"><dt>Файлов затронуто</dt><dd id="metric-files">—</dd></div>
+              <div class="summary-item"><dt>Пользователей</dt><dd id="metric-users">—</dd></div>
+            </dl>
+          </section>
+
+          <section class="panel events-panel" aria-labelledby="events-title">
+            <div class="panel-heading events-heading">
+              <div><div class="section-title-row"><h2 id="events-title">Последние действия</h2><span class="table-count" id="table-count">0 действий</span></div><p class="panel-subtitle">События из журнала безопасности Windows</p></div>
+              <button class="button button-secondary" type="button" data-show-events><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Весь журнал</button>
+            </div>
+            <div class="table-toolbar">
+              <label class="search-box"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.8" cy="8.8" r="5.8" stroke="currentColor" stroke-width="1.5"/><path d="m13.2 13.2 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="sr-only">Поиск по журналу</span><input id="search-input" type="search" placeholder="Файл, пользователь или путь" autocomplete="off"><kbd>Ctrl K</kbd></label>
+              <label class="select-wrap action-select"><span class="sr-only">Тип действия</span><select id="operation-select" aria-label="Фильтр по типу действия"><option value="all">Все действия</option><option value="Запись">Запись в файл</option><option value="Удаление">Удаление файла</option><option value="Операция с именем">Операция с именем</option></select><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 6 4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></label>
+              <button class="button button-secondary export-button" id="export-button" type="button"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 3v9m0 0 3.2-3.2M10 12 6.8 8.8M4 13.5v2.75c0 .41.34.75.75.75h10.5a.75.75 0 0 0 .75-.75V13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Экспорт CSV</button>
+            </div>
+            <div class="table-scroll">
+              <table class="events-table"><thead><tr><th scope="col">Файл</th><th scope="col">Пользователь</th><th scope="col">Действие</th><th scope="col">Время</th><th scope="col">Сервер</th></tr></thead><tbody id="events-body"></tbody></table>
+              <div class="empty-state" id="empty-state" hidden><span class="empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6 3.75h8.5L19 8.25v12H6V3.75Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M14.5 4v4.5H19M9 12h7m-7 3.5h7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span><strong id="empty-title">Действий пока нет</strong><span id="empty-copy">Когда пользователь изменит файл, запись появится здесь.</span></div>
+            </div>
+            <div class="table-footer"><span id="table-footer-label">Показаны последние действия</span><button type="button" class="text-button" id="clear-search" hidden>Сбросить фильтры</button><span class="table-updated" id="table-updated">Автообновление</span></div>
+          </section>
+          <details class="activity-details"><summary>Активность по времени</summary>
+          <section class="panel chart-panel" aria-labelledby="chart-title">
+            <div class="panel-heading chart-heading">
+              <div><div class="section-title-row"><h2 id="chart-title">Активность</h2><span class="live-tag" id="source-tag"><span class="live-indicator" aria-hidden="true"></span><span>Демо</span></span></div><p class="panel-subtitle" id="chart-subtitle">События записи и удаления за последние 24 часа</p></div>
+              <label class="select-wrap"><span class="sr-only">Период графика</span><select id="period-select" aria-label="Период графика"><option value="24h">Последние 24 часа</option><option value="7d">Последние 7 дней</option><option value="30d">Последние 30 дней</option><option value="all">Всё время</option></select><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 6 4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></label>
+            </div>
+            <div class="chart-summary"><strong id="chart-total">—</strong><span>действий за период</span><span class="chart-legend"><i aria-hidden="true"></i>Действия с файлами</span></div>
+            <div class="chart-wrap" id="activity-chart" role="img" aria-label="График действий аудита"></div>
+          </section>
+
+          </details>
+
+          <p class="privacy-note"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.25"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>В журнал попадают путь, пользователь и время. Содержимое файлов не читается.</p>
+        </section>
+
+        <section class="view-panel" id="events-view" aria-labelledby="events-page-title" hidden>
+          <div class="page-heading compact-heading"><div><h1 id="events-page-title">Журнал</h1><p class="page-subtitle">Поиск по пользователям, файлам и совершённым действиям.</p></div><button class="button button-secondary" type="button" id="events-refresh"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M16.2 8a6.5 6.5 0 0 0-11.8-2L3 8m0-4v4h4m-3.2 4a6.5 6.5 0 0 0 11.8 2L17 12m0 4v-4h-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Обновить</button></div>
+          <div class="panel events-panel full-events-panel">
+            <div class="table-toolbar">
+              <label class="search-box"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.8" cy="8.8" r="5.8" stroke="currentColor" stroke-width="1.5"/><path d="m13.2 13.2 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="sr-only">Поиск по журналу</span><input id="events-search-input" type="search" placeholder="Файл, пользователь или путь" autocomplete="off"></label>
+              <label class="select-wrap action-select"><span class="sr-only">Тип действия</span><select id="events-operation-select" aria-label="Фильтр по типу действия"><option value="all">Все действия</option><option value="Запись">Запись в файл</option><option value="Удаление">Удаление файла</option><option value="Операция с именем">Операция с именем</option></select><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 6 4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></label>
+              <label class="select-wrap action-select"><span class="sr-only">Период</span><select id="events-period-select" aria-label="Период журнала"><option value="24h">24 часа</option><option value="7d">7 дней</option><option value="30d">30 дней</option><option value="all">Всё время</option></select><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 6 4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></label>
+              <button class="button button-secondary export-button" id="events-export-button" type="button"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 3v9m0 0 3.2-3.2M10 12 6.8 8.8M4 13.5v2.75c0 .41.34.75.75.75h10.5a.75.75 0 0 0 .75-.75V13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Экспорт CSV</button>
+            </div>
+            <div class="table-scroll"><table class="events-table"><thead><tr><th scope="col">Файл</th><th scope="col">Пользователь</th><th scope="col">Действие</th><th scope="col">Время</th><th scope="col">Сервер</th></tr></thead><tbody id="all-events-body"></tbody></table><div class="empty-state" id="all-empty-state" hidden><span class="empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6 3.75h8.5L19 8.25v12H6V3.75Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M14.5 4v4.5H19M9 12h7m-7 3.5h7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span><strong>Ничего не найдено</strong><span>Измените запрос или сбросьте фильтры.</span></div></div>
+            <div class="table-footer"><span id="all-table-footer-label">—</span><button type="button" class="text-button" id="all-clear-search" hidden>Сбросить фильтры</button><span class="table-updated" id="all-table-updated">Автообновление</span></div>
+          </div>
+          <p class="privacy-note"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.25"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>Журнал хранится локально на сервере. Удалённое содержимое файлов не копируется.</p>
+        </section>
+
+        <section class="view-panel" id="sources-view" aria-labelledby="sources-page-title" hidden>
+          <div class="page-heading compact-heading"><div><h1 id="sources-page-title">Настройка</h1><p class="page-subtitle">Наблюдаемые папки и состояние сбора.</p></div><button class="button button-primary" type="button" data-open-connect><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 3v14M3 10h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>Настроить папки</button></div>
+          <div class="source-status-card panel">
+            <div class="source-status-icon" id="source-status-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="3.5" width="16" height="17" rx="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 8h8m-8 4h8m-8 4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="source-status-copy"><span class="source-kicker">Журнал безопасности Windows</span><h2 id="source-status-title">Сбор не настроен</h2><p id="source-status-copy">Настройте аудит файловой системы на Windows Server, чтобы получать реальные события.</p></div>
+            <span class="status-pill status-idle" id="source-status-pill"><span aria-hidden="true"></span>Не настроен</span>
+          </div>
+          <div class="source-grid">
+            <section class="panel source-detail-card"><div class="panel-heading"><div><h2>Наблюдаемые папки</h2><p class="panel-subtitle">В этих папках отслеживаются действия с файлами</p></div><span class="detail-count" id="source-root-count">0</span></div><div id="source-roots-list" class="source-roots-list"><div class="source-empty"><span class="source-empty-mark" aria-hidden="true"></span><span>Папки ещё не добавлены</span></div></div><button type="button" class="source-add-button" data-open-connect><span aria-hidden="true">+</span>Добавить папку</button></section>
+            <section class="panel source-detail-card collector-card"><div class="panel-heading"><div><h2>Сбор данных</h2><p class="panel-subtitle">Фоновая задача на этом сервере</p></div><span class="collector-icon" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none"><path d="m7 5-5 5 5 5m6-10 5 5-5 5m-2.5-12-2 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><div class="collector-facts"><div><span>СОСТОЯНИЕ</span><strong id="collector-state">Не запущен</strong></div><div><span>СЕРВЕР</span><strong id="collector-host">—</strong></div><div><span>ПОСЛЕДНЯЯ ПРОВЕРКА</span><strong id="collector-last-check">—</strong></div><div><span>ЖУРНАЛ ДАННЫХ</span><strong>JSONL · локально</strong></div></div><button type="button" class="button button-secondary source-instructions" data-open-connect>Инструкция по подключению <span aria-hidden="true">→</span></button></section>
+          </div>
+          <section class="log-location" aria-labelledby="log-location-title">
+            <div><h2 id="log-location-title">Папка журнала</h2><p>Здесь сохраняются записи аудита и служебные логи приложения.</p><code id="log-directory">C:\ProgramData\DocumentAudit</code></div>
+            <p>Чтобы выбрать другую папку на локальном диске сервера, откройте <strong>Choose-Log-Folder.cmd</strong> в папке приложения. Предыдущие записи аудита будут скопированы.</p>
+          </section>
+          <div class="retention-note"><span class="note-icon" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.25" stroke="currentColor" stroke-width="1.5"/><path d="M10 9v4M10 6.2h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span><span><strong>Важная особенность аудита Windows</strong><span>При сохранении файла Windows может создать несколько событий. Близкие события объединяются в журнале. Старые записи «Операция с именем» могли сопровождать переименование или удаление.</span></span></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <dialog class="connect-dialog" id="connect-dialog" aria-labelledby="connect-title">
+    <div class="dialog-head"><div><div class="eyebrow"><span class="eyebrow-mark" aria-hidden="true"></span>НАСТРОЙКА ИСТОЧНИКА</div><h2 id="connect-title">Настройка аудита папок</h2><p>При первом запуске выберите папки для наблюдения и место для журнала.</p></div><button class="icon-button dialog-close" type="button" aria-label="Закрыть инструкцию" data-close-dialog><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button></div>
+    <ol class="setup-steps">
+      <li><span class="step-number">1</span><div class="step-content"><strong>Откройте Start-Audit.cmd</strong><p>Дважды щёлкните файл в папке приложения. Windows попросит подтвердить права администратора.</p><span class="step-hint">Node.js и другие программы устанавливать не нужно.</span></div></li>
+      <li><span class="step-number">2</span><div class="step-content"><strong>Выберите папки с файлами</strong><p>В окне выбора укажите общий каталог. Можно добавить несколько папок.</p><span class="step-hint">Для изменения списка папок откройте Configure-Audit.cmd.</span></div></li>
+      <li><span class="step-number">3</span><div class="step-content"><strong>Выберите папку для журнала</strong><p>Можно оставить предложенный путь или выбрать папку на другом локальном диске. Позже её можно изменить через Choose-Log-Folder.cmd.</p></div></li>
+      <li><span class="step-number">4</span><div class="step-content"><strong>Работайте с журналом</strong><p>Панель откроется автоматически. Сбор событий будет продолжаться в фоне после закрытия браузера и при перезапуске компьютера.</p></div></li>
+    </ol>
+    <div class="dialog-foot"><span><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.25"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>Приложение не отправляет данные во внешнюю сеть.</span><button class="button button-secondary" type="button" data-close-dialog>Понятно</button></div>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

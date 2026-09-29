@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [string]$DataDirectory = (Join-Path $env:ProgramData 'DocumentAudit'),
     [ValidateRange(2, 300)]
